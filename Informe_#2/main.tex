@@ -1,0 +1,281 @@
+\documentclass[12pt, letterpaper]{article}
+
+% --- Paquetes para APA 7 y Formato ---
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[spanish, es-tabla]{babel}
+\usepackage{csquotes}
+\usepackage[margin=2.54cm]{geometry} 
+\usepackage{times} 
+\usepackage{setspace} 
+\usepackage{graphicx}
+\usepackage{microtype}
+\usepackage{indentfirst} 
+\usepackage{titlesec}
+\usepackage{hyperref}
+\usepackage{caption}
+\usepackage{float}
+
+% --- Configuración de Referencias APA 7 ---
+\usepackage[style=apa, backend=biber]{biblatex}
+\addbibresource{./referencias.bib}
+
+\doublespacing
+% Configuración de Títulos Estilo APA 7
+\titleformat{\section}
+  {\normalfont\large\bfseries\centering}{\thesection}{1em}{} % Nivel 1: Centrado y Negrita
+
+\titleformat{\subsection}
+  {\normalfont\normalsize\bfseries}{\thesubsection}{1em}{} % Nivel 2: Izquierda y Negrita
+
+\titleformat{\subsubsection}
+  {\normalfont\normalsize\bfseries\itshape}{\thesubsubsection}{1em}{} % Nivel 3: Izquierda, Negrita y Cursiva
+  
+\begin{document}
+
+% --- PORTADA ---
+\pagenumbering{alph}
+\begin{titlepage}
+    \centering
+    \vspace*{0.5cm}
+    \includegraphics[width=0.4\textwidth]{Logo_UNAL.png}\\[1cm] 
+    
+    {\setstretch{1.0}
+    {\textbf{UNIVERSIDAD NACIONAL DE COLOMBIA}}\\[0.4cm]
+    {Facultad de Ingeniería}\\[0.2cm]
+    {Modelos y Simulación (2025970)}
+    }
+    \vfill
+
+    % --- Título Académico en la Portada ---
+{\setstretch{1.5} % Aumenta ligeramente el espacio entre líneas del título si es largo
+    {\huge \textbf{Simulación de Eventos Discretos (SED)}}
+}
+\vfill
+\textbf{Autores:}\\[0.5cm]
+Ever Nicolás Muñoz Cortés (evmunoz@unal.edu.co)\\
+Samuel Andres Herrera Villero (saherrerav@unal.edu.co)\\
+Fredy Santiago Garcia Anzola (frgarciaa@unal.edu.co)\\
+Katherinne Lucia Olaya Paguatian (kolayap@unal.edu.co)
+
+\vfill
+    \textbf{Docente:}\\
+    Ángela María Arboleda Restrepo
+\vfill
+
+    Bogotá D.C.\\
+    27 de febrero de 2026
+\end{titlepage}
+\newpage
+\pagenumbering{arabic}
+
+% --- CUERPO DEL DOCUMENTO: TALLER 2 SED (CONCEPTUALIZACIÓN) ---
+
+\section*{Representación Gráfica del Sistema Modelado}
+El sistema se conceptualiza como un modelo de colas con servidores móviles y estaciones de carga. El flujo principal conecta el edificio de aulas con el Laboratorio de Ingeniería, integrando variables de movilidad estudiantil y autonomía energética.
+
+\begin{figure}[H]
+    \raggedright
+    \textbf{Figura 1} \\
+    \textit{Representación conceptual del sistema de microtránsito y flujo de entidades} \\
+    \vspace{0.3cm}
+    \centering
+    \textit{[Insertar Diagrama General]} \\
+    \vspace{0.2cm}
+    \raggedright
+    \small \textit{Nota.} Elaboración propia basada en la arquitectura de simulación de \textcite{Apolo2021}.
+\end{figure}
+
+\section*{Datos del Problema}
+\begin{table}[H]
+    \raggedright
+    \textbf{Tabla 1} \\
+    \textit{Resumen de parámetros operativos y reglas de procesamiento} \\
+    \vspace{0.3cm}
+    \centering
+    \small
+    \begin{tabular}{|l|l|p{5cm}|}
+    \hline
+    \textbf{Evento / Dato} & \textbf{Distribución} & \textbf{Regla de procesamiento} \\ \hline
+    Arribo Estudiantes & Empírica (329 encuestas) & Elección de modo según probabilidad de caracterización. \\ \hline
+    Despacho de Bus & Basado en capacidad & Salida por umbral de ocupación (12-19 pax) o tiempo máximo. \\ \hline
+    Consumo Energético & Ficha técnica EV & Disminución de SOC según longitud de ruta (1.5 km - 2.94 km). \\ \hline
+    \end{tabular}
+    \par\vspace{0.2cm}
+    \raggedright
+    \small \textit{Nota.} El modelo utiliza datos de velocidad constante y tiempos de espera de 7 a 10 minutos.
+\end{table}
+
+\section*{¿Qué se requiere?}
+La simulación busca evaluar la viabilidad del sistema de microtránsito eléctrico. Estima tiempos de espera en paraderos, ocupación del bus y ahorro de CO$_2$. La simulación finaliza mediante un \textit{End Event} programado al cumplirse 168 horas de tiempo de simulación (una semana académica).
+
+\section*{Eventos del Modelo}
+\begin{table}[H]
+    \raggedright
+    \textbf{Tabla 2} \\
+    \textit{Descripción de los eventos identificados en el modelo SED} \\
+    \vspace{0.3cm}
+    \centering
+    \small
+    \begin{tabular}{|l|p{7cm}|}
+    \hline
+    \textbf{Evento} & \textbf{Descripción técnica} \\ \hline
+    Llegada & Generación de entidad (alumno) y asignación de atributos de movilidad. \\ \hline
+    Abordaje (Boarding) & Transferencia de entidad de la cola al recurso; actualización de capacidad. \\ \hline
+    Carga de Batería & Interrupción de disponibilidad del recurso al alcanzar el umbral de carga. \\ \hline
+    \end{tabular}
+    \par\vspace{0.2cm}
+    \raggedright
+    \small \textit{Nota.} Los eventos disparan cambios instantáneos en las variables de estado del sistema.
+\end{table}
+
+\section*{Gráfico de los Eventos}
+\begin{figure}[H]
+    \raggedright
+    \textbf{Figura 2} \\
+    \textit{Línea de tiempo y secuencia lógica de eventos discretos} \\
+    \vspace{0.3cm}
+    \centering
+    \includegraphics[width=1\textwidth]{Grafico_de_los_Eventos.png} 
+    \vspace{0.2cm}
+    \raggedright
+    \small \textit{Nota.} El gráfico ilustra los saltos en el reloj de simulación disparados por la lista de eventos.
+\end{figure}
+
+
+
+\section*{Lista de Registros}
+
+\begin{table}[H]
+    \raggedright
+    \textbf{Tabla 3} \\
+    \textit{Relación de eventos, registros y atributos del sistema} \\
+    \vspace{0.3cm}
+    \centering
+    \small
+    \begin{tabular}{|l|l|p{6cm}|}
+    \hline
+    \textbf{Evento} & \textbf{Registro Asociado} & \textbf{Atributos (Data Records)} \\ \hline
+    \textbf{Arribo} & Entidad (Alumno) & ID\_Estudiante, Tipo\_Movilidad, Hora\_Llegada\_Paradero. \\ \hline
+    \textbf{Abordaje} & Recurso (Bus) & Capacidad\_Actual, Tiempo\_Espera\_Acumulado, Estado\_Ocupación. \\ \hline
+    \textbf{Viaje / Fin} & Estadísticas & SOC\_Final, CO2\_Ahorrado, Tiempo\_Total\_Sistema. \\ \hline
+    \textbf{Recarga} & Recurso (Bus) & SOC\_Inicial\_Carga, Duración\_Inactividad, Contador\_Recargas. \\ \hline
+    \end{tabular}
+    \par\vspace{0.2cm}
+    \raggedright
+    \small \textit{Nota.} Los atributos permiten la trazabilidad del estado de las entidades y el desempeño energético del recurso.
+\end{table}
+
+\section*{Diagramas de Flujo de los Eventos}
+% --- FIGURA 3: DIAGRAMA PRINCIPAL (MACRO) ---
+\begin{figure}[H]
+    \raggedright
+    \textbf{Figura 3} \\
+    \textit{Macroproceso lógico del sistema de microtránsito} \\
+    \vspace{0.2cm}
+    \centering
+    \includegraphics[width=0.65\textwidth]{Diagramas_de_Flujo_de_los_Eventos1.png}
+    \par\vspace{0.2cm}
+    \raggedright
+    \small \textit{Nota.} Estructura principal que conecta los subprocesos de arribo, cola y viaje.
+\end{figure}
+
+
+
+% --- FIGURA 4: SUBPROCESO ARRIBO ---
+\begin{figure}[H]
+    \raggedright
+    \textbf{Figura 4} \\
+    \textit{Subproceso: Caracterización de arribos estudiantiles} \\
+    \vspace{0.2cm}
+    \centering
+    \includegraphics[width=0.4\textwidth]{Diagramas_de_Flujo_de_los_Eventos2.png}
+    \par\vspace{0.2cm}
+    \raggedright
+    \small \textit{Nota.} Define la lógica de entrada al sistema basada en encuestas.
+\end{figure}
+
+% --- FIGURA 5: SUBPROCESO COLA ---
+\begin{figure}[H]
+    \raggedright
+    \textbf{Figura 5} \\
+    \textit{Subproceso: Gestión de cola y abordaje} \\
+    \vspace{0.2cm}
+    \centering
+    \includegraphics[width=0.75\textwidth]{Diagramas_de_Flujo_de_los_Eventos3.png}
+    \par\vspace{0.2cm}
+    \raggedright
+    \small \textit{Nota.} Control de espera y validación de capacidad del microbús.
+\end{figure}
+
+% --- FIGURA 6: SUBPROCESO VIAJE ---
+\begin{figure}[H]
+    \raggedright
+    \textbf{Figura 6} \\
+    \textit{Subproceso: Operación de viaje y control de batería} \\
+    \vspace{0.2cm}
+    \centering
+    \includegraphics[width=0.75\textwidth]{Diagramas_de_Flujo_de_los_Eventos4.png}
+    \par\vspace{0.2cm}
+    \raggedright
+    \small \textit{Nota.} Incluye el monitoreo del SOC y la decisión de recarga.
+\end{figure}
+
+\section*{Informes de Salida}
+Al finalizar la simulación de 168 horas, el modelo genera un reporte estadístico detallado que permite evaluar la viabilidad operativa y ambiental del sistema. Las métricas clave se agrupan en tres dimensiones:
+
+\begin{table}[H]
+    \raggedright
+    \textbf{Tabla 4} \\
+    \textit{Estadísticas de salida y métricas de desempeño del sistema (KPIs)} \\
+    \vspace{0.3cm}
+    \centering
+    \small
+    \begin{tabular}{|l|l|l|}
+    \hline
+    \textbf{Dimensión} & \textbf{Indicador (Métrica)} & \textbf{Unidad de Medida} \\ \hline
+    \textbf{Nivel de Servicio} & Tiempo promedio de espera en cola & Minutos / Estudiante \\ \cline{2-3} 
+                               & Total de estudiantes transportados & Entidades atendidas \\ \hline
+    \textbf{Eficiencia Recurso} & Tasa de ocupación promedio del bus & Porcentaje (\%) \\ \cline{2-3} 
+                               & Frecuencia de ciclos de carga (SOC) & Eventos por semana \\ \hline
+    \textbf{Impacto Ambiental} & Emisiones de CO$_2$ evitadas & Toneladas CO$_2$ eq \\ \hline
+    \end{tabular}
+    \par\vspace{0.2cm}
+    \raggedright
+    \small \textit{Note.} Los resultados se calculan con un intervalo de confianza del 95\% según la metodología de Law.
+\end{table}
+
+
+\section*{Aprendizajes}
+La realización de este análisis permitió consolidar conocimientos técnicos sobre el ciclo de vida de un proyecto de simulación, destacando los siguientes puntos:
+
+\begin{itemize}
+    \item \textbf{Aplicabilidad de la SED:} Se comprendió cómo la Simulación de Eventos Discretos permite modelar sistemas de logística urbana y movilidad sostenible, donde el estado del sistema cambia exclusivamente en puntos aislados del tiempo.
+    \item \textbf{Importancia de la Validación:} Se identificó que la utilidad de un modelo depende de su capacidad para representar la realidad, lo cual se garantizó en este caso mediante el uso de la prueba estadística T de Student para comparar datos simulados frente a registros históricos de parqueo.
+    \item \textbf{Toma de Decisiones Multicriterio:} Se reconoció el valor de integrar herramientas como el Proceso Analítico Jerárquico (AHP) para justificar técnicamente la selección de alternativas antes de proceder a la fase de experimentación computacional.
+\end{itemize}
+
+\section*{Contribuciones de los Miembros del Equipo}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|l|p{6cm}|}
+\hline
+\textbf{Miembro del equipo} & \textbf{Rol} & \textbf{Actividades/contribuciones} \\ \hline
+Katherinne Olaya & Investigadora & Búsqueda y selección del artículo científico y síntesis de la información clave. \\ \hline
+Samuel Herrera & Revisor & Redacción de los resultados del modelo, gestión de referencias bibliográficas y corrección de estilo. \\ \hline
+Fredy García & Analista & Análisis técnico de la estructura del modelo de simulación y descripción de su funcionamiento. \\ \hline
+Ever Muñoz & Editor & Creación de la plantilla técnica en LaTeX y redacción de la sección de conjunto de datos. \\ \hline
+\end{tabular}
+\end{table}
+
+\section*{Uso de Herramientas de Inteligencia Artificial}
+
+Se emplearon herramientas de IA generativa para la optimización del documento. Gemini se utilizó para la síntesis técnica, el control de cantidad de palabras y el formato de código LaTeX; ChatGPT para la estructura de la plantilla y organización bibliográfica; y Claude para la síntesis del análisis propio. Todo el contenido fue editado por los autores para asegurar precisión técnica y estilo académico.
+
+\newpage
+% --- SECCIÓN DE REFERENCIAS APA 7 ---
+\nocite{Apolo2021}
+\printbibliography[heading=bibintoc, title={Referencias}]
+
+\end{document}
